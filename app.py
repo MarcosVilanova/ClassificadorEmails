@@ -16,7 +16,7 @@ templates = Jinja2Templates(directory="templates")
 
 def consultar_ia(prompt: str, primeira_linha: bool = False, temperatura: float = 0.7, max_tokens: int = 200) -> str:
     headers = {
-        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Authorization": f"Bearer {GITHUB_TOKEN.strip()}",
         "Content-Type": "application/json"
     }
 
@@ -28,12 +28,22 @@ def consultar_ia(prompt: str, primeira_linha: bool = False, temperatura: float =
     }
 
     resp = requests.post(GITHUB_MODELS_URL, headers=headers, json=dados, timeout=60)
-    resposta = resp.json()["choices"][0]["message"]["content"].strip()
+
+    
+    print("STATUS:", resp.status_code)
+    print("RESPOSTA:", resp.text)
+
+   
+    try:
+        resposta = resp.json()["choices"][0]["message"]["content"].strip()
+    except:
+        return f"Erro na IA: {resp.text}"
 
     if primeira_linha:
         resposta = resposta.split('\n')[0]
 
     return resposta
+
 
 
 def classificar_email(texto: str) -> str:
